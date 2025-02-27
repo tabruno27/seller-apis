@@ -12,7 +12,32 @@ logger = logging.getLogger(__file__)
 
 
 def get_product_list(last_id, client_id, seller_token):
-    """Получить список товаров магазина озон"""
+    """Получить список товаров магазина Ozon.
+
+    Эта функция отправляет запрос к API Ozon для получения списка товаров
+    магазина с учетом заданного идентификатора последнего товара.
+
+    Args:
+        last_id (str): Идентификатор последнего товара, используемый для
+            пагинации списка товаров.
+        client_id (str): Идентификатор клиента, используемый для аутентификации
+            при обращении к API Ozon.
+        seller_token (str): Токен продавца, необходимый для доступа к API.
+
+    Returns:
+        list: Список товаров, содержащий информацию о товарах магазина.
+    
+    Raises:
+        requests.exceptions.HTTPError: Если запрос к API не удался.
+
+    Examples:
+        >>> get_product_list("", "12345", "abcde12345")
+        [{'offer_id': '1', 'name': 'Товар 1', 'price': 100}, 
+         {'offer_id': '2', 'name': 'Товар 2', 'price': 200}]
+
+        >>> get_product_list("1", "12345", "abcde12345")
+        [{'offer_id': '2', 'name': 'Товар 2', 'price': 200}]
+    """
     url = "https://api-seller.ozon.ru/v2/product/list"
     headers = {
         "Client-Id": client_id,
@@ -32,7 +57,26 @@ def get_product_list(last_id, client_id, seller_token):
 
 
 def get_offer_ids(client_id, seller_token):
-    """Получить артикулы товаров магазина озон"""
+    """Получить артикулы товаров магазина Ozon.
+
+    Эта функция обращается к API Ozon для получения списка артикулов
+    всех товаров магазина, используя идентификатор клиента и токен
+    продавца для аутентификации.
+
+    Args:
+        client_id (str): Идентификатор клиента для аутентификации.
+        seller_token (str): Токен продавца для доступа к API.
+
+    Returns:
+        list: Список артикулов товаров, полученных из API.
+
+    Examples:
+        >>> get_offer_ids("12345", "abcde12345")
+        ['offer_id_1', 'offer_id_2', 'offer_id_3']
+
+        >>> get_offer_ids("", "")
+        []  # Пустой список, если не переданы корректные идентификаторы
+    """
     last_id = ""
     product_list = []
     while True:
@@ -49,7 +93,30 @@ def get_offer_ids(client_id, seller_token):
 
 
 def update_price(prices: list, client_id, seller_token):
-    """Обновить цены товаров"""
+    """Обновить цены товаров в магазине Ozon.
+
+    Эта функция отправляет запрос к API Ozon для обновления цен
+    на указанные товары. Для выполнения запроса используются
+    идентификатор клиента и токен продавца.
+
+    Args:
+        prices (list): Список объектов с информацией о ценах на товары.
+        client_id (str): Идентификатор клиента для аутентификации.
+        seller_token (str): Токен продавца для доступа к API.
+
+    Returns:
+        dict: Ответ API в формате JSON, содержащий информацию об обновлении цен.
+
+    Raises:
+        HTTPError: Если запрос завершился неудачно, будет вызвано исключение.
+
+    Examples:
+        >>> update_price([{"offer_id": "offer_id_1", "price": 1000}], "12345", "abcde12345")
+        {'result': True, 'message': 'Prices updated successfully'}
+
+        >>> update_price([], "12345", "abcde12345")
+        {'result': False, 'message': 'No prices to update'}
+    """
     url = "https://api-seller.ozon.ru/v1/product/import/prices"
     headers = {
         "Client-Id": client_id,
@@ -62,7 +129,30 @@ def update_price(prices: list, client_id, seller_token):
 
 
 def update_stocks(stocks: list, client_id, seller_token):
-    """Обновить остатки"""
+    """Обновить остатки товаров в магазине Ozon.
+
+    Эта функция отправляет запрос к API Ozon для обновления остатков
+    на указанные товары. Для выполнения запроса используются
+    идентификатор клиента и токен продавца для аутентификации.
+
+    Args:
+        stocks (list): Список объектов с информацией об остатках на товары.
+        client_id (str): Идентификатор клиента для аутентификации.
+        seller_token (str): Токен продавца для доступа к API.
+
+    Returns:
+        dict: Ответ API в формате JSON, содержащий информацию об обновлении остатков.
+
+    Raises:
+        HTTPError: Если запрос завершился неудачно, будет вызвано исключение.
+
+    Examples:
+        >>> update_stocks([{"offer_id": "offer_id_1", "stock": 100}], "12345", "abcde12345")
+        {'result': True, 'message': 'Stocks updated successfully'}
+
+        >>> update_stocks([], "12345", "abcde12345")
+        {'result': False, 'message': 'No stocks to update'}
+    """
     url = "https://api-seller.ozon.ru/v1/product/import/stocks"
     headers = {
         "Client-Id": client_id,
@@ -75,7 +165,25 @@ def update_stocks(stocks: list, client_id, seller_token):
 
 
 def download_stock():
-    """Скачать файл ostatki с сайта casio"""
+    """Скачать файл остатков часов с сайта Casio и вернуть их в виде списка.
+
+    Эта функция загружает ZIP-файл с остатками часов с указанного URL,
+    извлекает его и преобразует содержимое Excel-файла в список словарей,
+    где каждый словарь представляет информацию об остатках.
+
+    Returns:
+        list: Список словарей, содержащих информацию об остатках часов.
+
+    Raises:
+        HTTPError: Если запрос завершился неудачно, будет вызвано исключение.
+        FileNotFoundError: Если файл Excel не найден после извлечения.
+        ValueError: Если возникла ошибка при чтении Excel-файла.
+
+    Examples:
+        >>> stock_data = download_stock()
+        >>> print(stock_data)
+        [{'model': 'Casio A', 'stock': 10}, {'model': 'Casio B', 'stock': 5}, ...]
+    """
     # Скачать остатки с сайта
     casio_url = "https://timeworld.ru/upload/files/ostatki.zip"
     session = requests.Session()
