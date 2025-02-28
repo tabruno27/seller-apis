@@ -301,7 +301,6 @@ async def upload_prices(watch_remnants, campaign_id, market_token):
     return prices
 
 
-
 async def upload_stocks(watch_remnants, campaign_id, market_token, warehouse_id):
     """Загружает остатки товаров в заданную кампанию и возвращает список не пустых остатков.
 
