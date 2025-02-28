@@ -186,7 +186,6 @@ def create_stocks(watch_remnants, offer_ids, warehouse_id):
         >>> create_stocks([], ["sku1"], "warehouse_1")
         [{'sku': 'sku1', 'warehouseId': 'warehouse_1', 'items': [{'count': 0, 'type': 'FIT', 'updatedAt': '2023-10-01T12:00:00Z'}]}]
     """
-    import datetime
     stocks = list()
     date = str(datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z")
     for watch in watch_remnants:
